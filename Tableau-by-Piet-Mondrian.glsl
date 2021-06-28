@@ -1,5 +1,3 @@
-#version 300 es
-
 #ifdef GL_ES
 precision mediump float;
 #endif
@@ -24,38 +22,53 @@ precision mediump float;
 uniform vec2 u_resolution;
 uniform float u_time;
 uniform vec2 u_mouse;
-out vec4 FragCoor;
 
-float Band(float p, float start, float end, float blur) {
-    float step1 = smoothstep(start - blur, start + blur, p);
-    float step2 = smoothstep(end + blur, end - blur, p);
+float Band(float c, float start, float end) {
+    float step1 = smoothstep(start, end, c);
+    float step2 = smoothstep(start, end, 1.0 - c);
     return step1 * step2;
 }
 
-float Rect(vec2 uv, float startX, float endX, float startY, float endY, float blur) {
-    float h = Band(uv.x, startX, endX, blur);
-    float v = Band(uv.y, startY, endY, blur);
-
-    return v * h;
+float Rect(vec2 coord, float width, float height) {
+    width = (1.0 - width ) / 2.0;
+    height = (1.0 - height ) / 2.0;
+    float step1 = Band(coord.x, width, width);
+    float step2 = Band(coord.y, height, height);
+    return step1 * step2;
 }
 
-
 void main() {
+
     vec2 uv = gl_FragCoord.xy / u_resolution.xy;
 
-    uv -= vec2(.5);
-    uv /= 1.0;
     float x = uv.x;
+    float y = uv.y;
+    x *= u_resolution.x / u_resolution.y;
 
-    float m = sin(x * 25.0 + u_time) * .2;
+    x += .5;
+    y -= .4;
+  
+    float color = Rect(vec2(x, y), .1, .2);
 
-    float y = uv.y - m;
+    vec3 finalColor = vec3(color) * PURPLE;
 
-    // x += y * .2;
-    float blur = .01;
-    float pct = Rect(vec2(x, y), -.3, .3, -.2, .2, blur);
+    x -= .12;
+    y -= 0.0;
 
-    vec3 color = pct * YELLOW;
+    float color2 = Rect(vec2(x, y), .1, .2);
+    vec3 f = vec3(color2) * RED;
 
-    FragCoor = vec4(color, 1.0);
+    finalColor += f;
+
+    x -= .27;
+    y -= 0.0;
+
+    float color3 = Rect(vec2(x, y), .4, .2);
+    vec3 f3 = vec3(color3) * YELLOW;
+
+    finalColor += f3;
+
+
+
+    gl_FragColor = vec4(finalColor, 1.0);
 }
