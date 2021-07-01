@@ -47,6 +47,18 @@ float SmoothNoise(vec2 uv) {
     return mix(b, t, lv.y);
 }
 
+float SoomthNoise2(vec2 uv) {
+
+    float c = SmoothNoise(uv * 4.);
+    c += SmoothNoise(uv * 8.) * .5;
+    c += SmoothNoise(uv * 16.) * .25;
+    c += SmoothNoise(uv *32.) * .125;
+    c += SmoothNoise(uv *64.) * .0625;
+
+    return c /= 2.;
+
+}
+
 void main() {
     vec2 uv = gl_FragCoord.xy / u_resolution;
 
@@ -59,10 +71,10 @@ void main() {
     // intensity = clamp(intensity * 6., 0., 1.);
     // vec3 color = mix(color1, color2, intensity) * 1.0;
 
-   
-    float c = SmoothNoise(uv * 4.);
+    uv += u_time * .1;
+    float c = SoomthNoise2(uv);
     vec3 color = vec3(c);
-
+    color *= YELLOW;
     gl_FragColor = vec4(color, 1.);
 }
 
