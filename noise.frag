@@ -71,10 +71,10 @@ void main() {
     // intensity = clamp(intensity * 6., 0., 1.);
     // vec3 color = mix(color1, color2, intensity) * 1.0;
 
-    uv += u_time * .1;
+    uv += u_time * .01;
     float c = SoomthNoise2(uv);
     vec3 color = vec3(c);
-    color *= YELLOW;
+    color *= WHITE;
     gl_FragColor = vec4(color, 1.);
 }
 
