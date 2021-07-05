@@ -40,15 +40,20 @@ void main() {
     vec2 uv = gl_FragCoord.xy/ u_resolution;
     vec2 m = u_mouse / u_resolution;
     vec2 mouse = vec2(fract(m.x), fract(m.y));
-
+    const float devidedFactor = 4.;
+    float everyDevied = 1. / 4.;
+    float width = everyDevied / 2.;
     vec3 color = vec3(1.);
-   
+    // if(length(mouse) <= length(uv)) {
+    //    color *= BLUE;
+    // }
 
     // uv.x = u_resolution.x / u_resolution.y;
-    uv = mod(uv * 3., 1.);
+    // 分成4 * 4
+    uv = mod(uv * 4., 1.);
 
 
-     if(uv.x - mouse.x <= 0.) {
+    if(mod(uv.x, .25) > 1. ) {
         color *= RED;
     }
     // float border = clamp(sin(u_time * 1.) - .8, .1, .2);
@@ -62,8 +67,8 @@ void main() {
 
     c *= t * b;
 
-   color *= vec3(c);
-   
+    color *= vec3(c);
+  
     
     gl_FragColor = vec4(color, 1.);
 }

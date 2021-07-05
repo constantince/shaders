@@ -55,7 +55,7 @@ const vec2 grid = vec2(50);
 void main() {
 
     vec2 uv = gl_FragCoord.xy;
-    vec2 m = mod(uv, 2.0 * grid);
+    vec2 m = mod(uv, vec2(100., 100.));
     vec3 color = BLACK;
 
     if( m.x < grid.x && m.y < grid.y || m.x >= grid.x && m.y>= grid.y) {
