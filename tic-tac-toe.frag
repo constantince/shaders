@@ -43,19 +43,22 @@ void main() {
     const float devidedFactor = 4.;
     float everyDevied = 1. / 4.;
     float width = everyDevied / 2.;
-    vec3 color = vec3(1.);
-    // if(length(mouse) <= length(uv)) {
-    //    color *= BLUE;
-    // }
+    vec3 color = vec3(0.);
+   
 
     // uv.x = u_resolution.x / u_resolution.y;
     // 分成4 * 4
-    uv = mod(uv * 4., 1.);
+    // uv = fract(uv * 4.);
 
+    vec2 id = floor(uv * 2.);
 
-    if(mod(uv.x, .25) > 1. ) {
-        color *= RED;
-    }
+    // if( mod(id, vec2(2.0)) == vec2(1.)){
+    //     color *= BLACK;
+    // }
+
+    // if(mod(uv.x, .25) > 1. ) {
+    //     color *= RED;
+    // }
     // float border = clamp(sin(u_time * 1.) - .8, .1, .2);
     const float border = .01;
     float r = step(uv.x, 1. - border);
@@ -67,8 +70,9 @@ void main() {
 
     c *= t * b;
 
-    color *= vec3(c);
+    color.rg = id;
   
     
     gl_FragColor = vec4(color, 1.);
+    //  gl_FragColor = vec4(vec3(0., 1., 0.), 1.);
 }

@@ -71,7 +71,7 @@ void main() {
     // intensity = clamp(intensity * 6., 0., 1.);
     // vec3 color = mix(color1, color2, intensity) * 1.0;
 
-    uv += u_time * .01;
+    uv += u_time * .05;
     float c = SoomthNoise2(uv);
     vec3 color = vec3(c);
     color *= WHITE;
