@@ -11,12 +11,14 @@ void main() {
     const float factor = 8.;
     vec3 color = vec3(0.);
     vec2 id = floor(uv * factor);
-    vec2 m =  mod(id, vec2(2.) );
+    float c =  mod(id.y + id.x, 2.);
+    /* do the same things
     if(m == vec2(1.0, 0.)
         || m == vec2(0., 1.)
      ) {
         color = vec3(1.0);
     }
-
+    */
+    color = vec3(c);
     gl_FragColor = vec4(color, 1.0);
 }
