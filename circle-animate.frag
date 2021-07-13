@@ -30,6 +30,8 @@ void main() {
     vec2 uv = gl_FragCoord.xy / u_resolution;
     uv -= .5;
 
+    uv.x *= u_resolution.x / u_resolution.y;
+
     vec3 color = vec3(circle(uv, .5));
 
     color *= RED;
