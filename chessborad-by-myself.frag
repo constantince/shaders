@@ -8,10 +8,10 @@ uniform float u_time;
 
 void main() {
     vec2 uv = gl_FragCoord.xy / u_resolution;
-    const float factor = 8.;
+    const float factor = 3.;
     vec3 color = vec3(0.);
     vec2 id = floor(uv * factor);
-    float c =  mod(id.y + id.x, 2.);
+    float c =  mod(id.x, 2.);
     /* do the same things
     if(m == vec2(1.0, 0.)
         || m == vec2(0., 1.)

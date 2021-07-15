@@ -52,9 +52,9 @@ void main() {
 
     vec2 id = floor(uv * 2.);
 
-    // if( mod(id, vec2(2.0)) == vec2(1.)){
-    //     color *= BLACK;
-    // }
+    if( mod(id, vec2(2.0)) == vec2(1.)){
+        color *= BLACK;
+    }
 
     // if(mod(uv.x, .25) > 1. ) {
     //     color *= RED;
@@ -70,7 +70,7 @@ void main() {
 
     c *= t * b;
 
-    color.rg = id;
+    // color.rg = id;
   
     
     gl_FragColor = vec4(color, 1.);

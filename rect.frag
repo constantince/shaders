@@ -47,7 +47,7 @@ void main() {
     uv /= 1.0;
     float x = uv.x;
 
-    float m = sin(x * 25.0 + u_time) * .2;
+    float m = sin(x * 5.0) * .2;
 
     float y = uv.y - m;
 
