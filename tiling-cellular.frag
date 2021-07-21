@@ -37,7 +37,7 @@ void main() {
             vec2 neighbor = vec2(float(x), float(y));
 
             vec2 point = random(neighbor + i_uv);
-            // there must be a point value in right equalation,for vec2 must equal to vec2;
+            // there must be a "point" variable in right equalation,for vec2 must equal to vec2;
             point = .5 + .5 * sin(u_time + point * 6.28);
 
             float dist = distance(neighbor + point, f_uv);
