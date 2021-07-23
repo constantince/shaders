@@ -29,33 +29,31 @@ float plot(vec2 st, float pct) {
     return step(pct - width, st.y) - step(pct, st.y);
 }
 
+float circle(vec2 st, float radius) {
+    return smoothstep(radius, radius + .001, length(st));
+}
+
 void main() {
 
-   vec2 uv = gl_FragCoord.xy / u_resolution;
+    vec2 uv = gl_FragCoord.xy / u_resolution;
     vec3 color = vec3(0.);
-    float pct = pow(cos(PI * uv.x / 2.), .5);
-    // pct = 1.0 - pow(abs(uv.x), 2.);
-    uv.y += .3;
-    color = vec3(plot(uv, pct));
-    uv.y += width;
-    color += vec3(plot(uv, pct)) * YELLOW;
-    uv.y += width;
-    color += vec3(plot(uv, pct)) * RED;
-    uv.y += width;
-    color += vec3(plot(uv, pct)) * BLUE;
-     uv.y += width;
-    color += vec3(plot(uv, pct)) * ORANGE;
-//    vec2 m = vec2(0.);
-//    float c = distance(m, vec2(uv.x, uv.y));
-//    vec3 c11 = vec3(mix(.2, .5, c));
-//    c11 += vec3(step(c, .25)) * BLUE;
-//    c11 += vec3(step(c, .30)) * ORANGE;
-//    c11 += vec3(step(c, .35)) * ORANGE;
-//    c11 += vec3(step(c, .40)) * RED;
-//    c11 += vec3(step(c, .45)) * RED;
-//    c11 += vec3(step(c, .5)) * AZUR;
+    uv.x -= .5;
+    float radius = .2;
+    float stripWidth = .04;
+    vec3 colors[7];
+    colors[0] = ORANGE;
+    colors[1] = VIOLET;
+    colors[2] = GREEN;
+    colors[3] = BLUE;
+    colors[4] = YELLOW;
+    colors[5] = RED;
+    colors[6] = WHITE;
 
-
-
+    // float pct = pow(cos(PI * uv.x / 2.), .5);
+    color = mix(WHITE, VIOLET, vec3(circle(uv, radius)));
+    for(int i=0; i<7; i++) {
+        float n = float(i);
+        color = mix(color, colors[i], vec3(circle(uv, radius + n * stripWidth)));
+    }
    gl_FragColor = vec4(color, 1.);
 }
