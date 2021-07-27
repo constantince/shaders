@@ -35,7 +35,7 @@ mat2 scale(vec2 _scale){
 }
 
 float circle (vec2 st, float radius) {
-    return smoothstep(radius, radius + radius * px, length(st));
+    return smoothstep(radius, radius + radius + px, length(st));
 }
 
 float plot(vec2 st, float radius, float blur) {
@@ -80,21 +80,35 @@ vec3 trangle(vec2 uv, vec2 po, float rotate) {
     return color;
 }
 
+float plotx(vec2 st, float radius, float blur) {
+    return smoothstep(radius - .05, radius + px, length(st))
+        - smoothstep(radius + blur, radius + blur + px, length(st));
+}
+
 vec3 target (vec2 uv) {
-    uv /= .5;
+    uv /= .3;
     uv += random(0.63,-0.1,0.2,0.2,.2+sin(0.1*u_time)+0.5*u_time);
     float c = plot(uv, .05, .01);
     vec3 color = vec3(c);
     color *= red;
 
     // yellow inside circle
-    float y =  1. - circle(uv, .04 * step(.5, sin(u_time * 25.) + .5));
+    float y =  1. - circle(uv, .025 * step(.5, sin(u_time * 20.) + .5));
     color += y * red;
 
-    float wave = plot(uv, mod(u_time * .20, .3) + .05, .03);
+    float wave = plotx(uv, mod(u_time * .20, .3) + .05, .03);
     color += wave * RED;
 
     return color;
+}
+
+vec3 smallball(vec2 uv) {
+    uv /= .5;
+    uv += random(0.13,-0.21,0.2,0.22,.02+sin(u_time * 0.71)+0.5);
+    float y =  1. - circle(uv, .005);
+    uv += random(0.15,-0.28, -0.3, -0.12,.02+sin(u_time * 0.71)+0.5);
+    float x =  1. - circle(uv, .005);
+    return vec3(y + x);
 }
 
 float baseCirleWidth = .003;
@@ -116,6 +130,8 @@ void main() {
    
     color += target(uv);
 
+    color += smallball(uv);
+
     // color = mix(color, BLACK, color);
 
     float c0 = plot(uv, .01, baseCirleWidth - .001);
@@ -132,8 +148,8 @@ void main() {
 
 
     float c4 = plot(uv, .35, baseCirleWidth - .001);
-    if(abs(uv.y) >= (abs(sin(u_time)) + 1.) * .1)
-        color += c4 * CYAN;
+    if(abs(uv.y) >= (abs(sin(u_time * .5)) + .5) * .1)
+        color += c4 * blue2;
 
     float c5 = plot(uv, .45, baseCirleWidth);
     color += c5 * CYAN;
@@ -159,7 +175,7 @@ void main() {
 
    uv = rotate2d(-u_time - 1.20) * uv;
 //    uv.y += .2 * radians(-45.);
-   float scaner = line3(uv, .005);
+   float scaner = line3(uv, .003);
     // scaner = rotate2d(sin(u_time) * 3.141592) * scaner;
    if(abs(uv.x) <= .3*cos(radians(45.)) && uv.x >= 0.) {
         color += scaner * blue3;
