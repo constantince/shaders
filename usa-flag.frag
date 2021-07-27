@@ -22,17 +22,32 @@ uniform float u_time;
 
 #define PI            3.1415926535
 
+
+vec2 Remap(vec2 p, float t, float r, float b, float l) {
+    return vec2((p.x - l) / (r - l), (p.y - b) / (t - b));
+}
+
+
 void main() {
     vec2 uv = gl_FragCoord.xy / u_resolution;
+    // uv *= 1.1;
+    float t = uv.x * 7. - 2. * u_time + uv.y * 3.;
+    uv.y +=  sin( t ) * .05;
     // caculate the min pix in y axios;
-    float d = fwidth(uv.y);
+    float d = 0.01;
     vec3 c = mix(WHITE, RED, smoothstep(d, d, sin(uv.y * PI * 13.)));
 
     vec3 color = c;
 
-    if(uv.x > .0 && uv.x < .5 && uv.y < 1. && uv.y > 0.46) {
+    vec2 st = Remap(uv, 1., .4, .46, 0.);
+
+    if(st.x > .0 && st.x <= 1. && st.y <= 1. && st.y > 0.) {
         color = BLUE;
     }
 
+    color *= smoothstep(d, .0, abs(uv.y - .5) - .5 + d);
+
+
+    color *= .7 + cos(t) * .3;
     gl_FragColor = vec4(color, 1.);
 }
