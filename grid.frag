@@ -15,7 +15,7 @@ void main() {
     // float e = 1. - step(.9, uv.x);
     // a += step(.1, uv.x);
     // float b = step(.9, uv.y);
-    float c = mix(.3, 4., a * b);
+    float c = a * b;
     // float c = b * a;
     gl_FragColor = vec4(vec3(c), 1.);
 }
