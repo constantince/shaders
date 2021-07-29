@@ -66,21 +66,12 @@ float Stars(vec2 uv) {
     return star;
 }
 
-float Start2(vec2 uv) {
-    
-    vec2 id = floor(uv * vec2(6., 9.));
-    float n = 6.;
+float Start2(vec2 uv, vec2 num) {
     float ratio = 1.;
     float offset = 1.;
     float star;
-    if(mod(id.y, 2.0) > 0.) {
-        // uv.x -= .1;
-        n = 5.;
-        ratio = 5.5 / 6.;
-        offset *= .5;
-    }
-    vec2 st = fract(uv * vec2(n, 9.));
-     star = 1. - smoothstep(0.,  0.005, sdStar5(st, .25 * ratio, .5, vec2(.5 * offset, 0.5)));
+    vec2 st = fract(uv * num);
+     star = 1. - smoothstep(0., 0.005, sdStar5(st, .25 * ratio, .5, vec2(.5 * offset, 0.5)));
     return star;
 }
 
@@ -103,7 +94,13 @@ void main() {
     vec2 st = Remap(uv, 1., .4, .46, 0.);
 
     if(st.x > .0 && st.x <= 1. && st.y <= 1. && st.y > 0.) {
-        color = mix(BLUE, WHITE, Start2(st));
+        color = mix(BLUE, WHITE, Start2(st, vec2(6., 5.)));
+
+        st = Remap(st, .9, .9166, .1, .0833);
+
+        if(st.x > .0 && st.x <= 1. && st.y <= 1. && st.y > 0.) {
+            color = mix(color, WHITE, Start2(st, vec2(5., 4.)));
+        }
     }
 
     

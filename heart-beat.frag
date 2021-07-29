@@ -21,6 +21,23 @@ uniform float u_time;
 #define VIOLET          vec3(0.5, 0.0, 1.0)
 #define AZUR            vec3(0.0, 0.5, 1.0)
 
+
+float sphere(vec3 p, float radius) {
+    return length(p) - radius;
+}
+
+float rayMarch(vec3 ro, vec3 rd, float start, float end) {
+    float depth = start;
+    for(int i=0; i<255; i++) {
+        vec3 p = start + depth * rd;
+        float d = sphere(p, 1.);
+        depth += d;
+        if(d < 0.001 || depth > 100.) break;
+    }
+
+    return depth;
+}
+
 float makeHeart(vec2 uv, float size) {
     float x = uv.x;
     float y = uv.y;
