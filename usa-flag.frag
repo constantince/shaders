@@ -94,7 +94,11 @@ void main() {
     vec2 st = Remap(uv, 1., .4, .46, 0.);
 
     if(st.x > .0 && st.x <= 1. && st.y <= 1. && st.y > 0.) {
-        color = mix(BLUE, WHITE, Start2(st, vec2(6., 5.)));
+        color = mix(
+            mix(color, BLUE, smoothstep(0., .01, st.y)),
+            WHITE,
+            Start2(st, vec2(6., 5.))
+        );
 
         st = Remap(st, .9, .9166, .1, .0833);
 

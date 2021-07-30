@@ -8,9 +8,10 @@ uniform float u_time;
 
 void main() {
     vec2 uv = gl_FragCoord.xy / u_resolution;
+    uv *= u_resolution.x / u_resolution.y;
     uv = fract(uv * 8.);
-    float a = step(uv.x, .9);
-    float b = step(.1, uv.y);
+    float a = step(uv.x, .98);
+    float b = step(.02, uv.y);
 
     // float e = 1. - step(.9, uv.x);
     // a += step(.1, uv.x);
