@@ -26,6 +26,43 @@ struct Surface {
     vec3 color;
 };
 
+mat3 rotateX(float q) {
+    return mat3(
+        vec3(1.0, 0.0, 0.0),
+        vec3(0.0, cos(q), -sin(q)),
+        vec3(0.0, sin(q), cos(q))
+    );
+}
+mat3 rotateY(float q) {
+    return mat3(
+        vec3(cos(q), 0.0, sin(q)),
+        vec3(0.0, 1.0, 0.0),
+        vec3(-sin(q), 0.0, cos(q))
+    );
+}
+
+mat3 rotateZ(float q) {
+    return mat3(
+        vec3(cos(q), -sin(q), 0.0),
+        vec3(sin(q), cos(q), 0.0),
+        vec3(0.0, 0.0, 1.0)
+    );
+}
+
+mat3 identity() {
+    return mat3(
+        vec3(1.0, 0.0, 0.0),
+        vec3(0.0, 1.0, 0.0),
+        vec3(0.0, 0.0, 1.0)
+    );
+}
+
+struct RotateMax {
+    mat3 rotateX;
+    mat3 rotateY;
+    mat3 rotateZ;
+};
+
 Surface flood (vec3 p, vec3 color) {
     return Surface(p.y + 1., color);
 }
@@ -36,15 +73,16 @@ Surface compare(Surface obj1, Surface obj2) {
     return obj2;
 }
 
-Surface sdRoundBox( vec3 p, vec3 b, vec3 offset, vec3 color )
+Surface sdRoundBox( vec3 p, vec3 b, vec3 offset, vec3 color, float radius, mat3 transform )
 {
-  vec3 q = abs(p - offset) - b;
-  return Surface(length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0), color);
+  vec3 m = (p - offset) * transform;
+  vec3 q = abs(m) - b;
+  return Surface(length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0) - radius, color);
 }
 
 Surface scene(vec3 p) {
     Surface f = flood(p, vec3(mod(floor(p.x) + floor(p.z), 2.0)));
-    Surface box = sdRoundBox(p, vec3(1.), vec3(0.0, 1.0, -4.0), CYAN);
+    Surface box = sdRoundBox(p, vec3(1.), vec3(0.0, 1.0, -4.0), CYAN, .01, rotateX(u_time));
     // return box;
     return compare(f, box);
 }
@@ -92,10 +130,6 @@ void main() {
         col = fDot * ray.color;
        
     }
-
-
-    
-
 
     gl_FragColor = vec4(col, 1.);
 }
