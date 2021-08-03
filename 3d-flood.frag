@@ -75,14 +75,14 @@ Surface compare(Surface obj1, Surface obj2) {
 
 Surface sdRoundBox( vec3 p, vec3 b, vec3 offset, vec3 color, float radius, mat3 transform )
 {
-  vec3 m = (p - offset) * transform;
+  vec3 m = (p - offset) * transform - vec3(3.0, 0.0, 0.0);
   vec3 q = abs(m) - b;
   return Surface(length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0) - radius, color);
 }
 
 Surface scene(vec3 p) {
     Surface f = flood(p, vec3(mod(floor(p.x) + floor(p.z), 2.0)));
-    Surface box = sdRoundBox(p, vec3(1.), vec3(0.0, 1.0, -4.0), CYAN, .01, rotateX(u_time));
+    Surface box = sdRoundBox(p, vec3(1.), vec3(0.0, 1.5, -4.0), CYAN, .1, rotateY(u_time));
     // return box;
     return compare(f, box);
 }
@@ -90,11 +90,11 @@ Surface scene(vec3 p) {
 Surface carmera(vec3 ro, vec3 rd, float start, float end) {
     float depth = start;
     Surface d;
-    for(int i=0; i<25; i++) {
+    for(int i=0; i<50; i++) {
         vec3 p = ro + rd * depth;
         d = scene(p);
         depth += d.d;
-        if( depth < 0.01 || depth > 10.) break;
+        if( depth < 0.01 || depth > 20.) break;
     }
 
     return Surface(depth, d.color);
@@ -119,7 +119,7 @@ void main() {
 
     Surface ray = carmera(ro, rd, 0.0, 10.0);
 
-    if( ray.d >= 10.0) {
+    if( ray.d >= 20.0) {
         
     } else {
         vec3 p = ro + rd * ray.d;
@@ -127,7 +127,8 @@ void main() {
         vec3 normal = calcNormal(p);
         vec3 ld = normalize(ls - p);
         float fDot = clamp(dot(ld, normal), 0.0, 1.0);
-        col = fDot * ray.color;
+        vec3 ambient = vec3(.2);
+        col = fDot * ray.color + ambient;
        
     }
 
