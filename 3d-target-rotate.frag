@@ -17,10 +17,11 @@ precision mediump float;
 #define ACQUA           vec3(0.0, 1.0, 0.5)
 #define VIOLET          vec3(0.5, 0.0, 1.0)
 #define AZUR            vec3(0.0, 0.5, 1.0)
-#define MAX_STEP        30
+#define MAX_STEP        200
 #define START           0.0
-#define END             10.0
+#define END             50.0
 #define MIN_PRECISION   0.01
+#define PI              3.1415926535
 
 uniform vec2 u_resolution;
 uniform float u_time;
@@ -51,10 +52,10 @@ Items findMin(Items obj1, Items obj2) {
 }
 
 Items assembleItems(vec3 p) {
-    vec3 size = vec3(.5);
-    Items box1 = sdBox(p, vec3(1.5, 0.1, 0.0), vec3(size), RED);
-    Items box2 = sdBox(p, vec3(0.0, 0.1, 0.0), vec3(size), GREEN);
-    Items box3 = sdBox(p, vec3(-1.5, 0.1, 0.0), vec3(size), BLUE);
+    vec3 size = vec3(.5, .1, -4.0);
+    Items box1 = sdBox(p, vec3(1.5, size.y, size.z), vec3(size.x), RED);
+    Items box2 = sdBox(p, vec3(0.0, size.y, size.z), vec3(size.x), GREEN);
+    Items box3 = sdBox(p, vec3(-1.5, size.y, size.z), vec3(size.x), BLUE);
     vec3 fCol = vec3(mod(floor(p.x) + floor(p.z), 2.0) * .8);
     Items flo = sdFloor(p, fCol);
 
@@ -90,27 +91,29 @@ Items rayMarch(vec3 ro, vec3 rd) {
 
 mat3 camera(vec3 ro, vec3 lp) { // different direction or cross position make different result
     vec3 camera_direction = normalize(lp - ro);
-    vec3 camera_right = normalize(cross(vec3(0.0, 1.0, 0.0), camera_direction));
+    vec3 camera_right = normalize(cross(camera_direction, vec3(0.0, 1.0, 0.0)));
     vec3 camera_up = normalize(cross(camera_direction, camera_right));
     return mat3(
         -camera_right,
-        camera_up,
+        -camera_up,
         -camera_direction
     );
 }
 
 
 
-const float radiusCamera = 10.0;
+const float radiusCamera = 40.0;
 
 void main() {
     vec2 uv = (gl_FragCoord.xy - .5 * u_resolution) / u_resolution.y;
     vec2 mouse = (u_mouse - .5 * u_resolution) / u_resolution.y;
     vec3 color;
-    vec3 ro = vec3(0.0, 0.1, 5.);
-    vec3 lp = vec3(0.0, 0.0, 0.0);
-    ro.x = radiusCamera * cos(u_time * .1) + lp.x;
-    ro.z = radiusCamera * sin(u_time * .1) + lp.z;
+    vec3 ro = vec3(0.0, 0.1, 0.);
+    vec3 lp = vec3(0.0, 0.1, -4.0);
+    // ro.x = radiusCamera * cos(mouse.x) + lp.x;
+    // ro.z = radiusCamera * sin(mouse.x) + lp.z;
+    ro.yz = ro.yz * radiusCamera * rotate2D(mix(PI/2., 0., mouse.y));
+    ro.xz = ro.xz * rotate2D(mix(-PI, PI, mouse.x)) + vec2(lp.x, lp.z);
     
     vec3 rd = vec3(uv, -1.0);
     rd *= camera(ro, lp);
@@ -120,7 +123,14 @@ void main() {
     if(u.d > END) {
         color = vec3(1.0);
     } else {
-        color = u.color;
+        vec3 po = ro + rd * u.d;
+        vec3 ls = vec3(0.0, 3.0, 0.0);
+        vec3 normal = calcNormal(po);
+        vec3 ld = normalize(ls - po);
+        float fDot = clamp(dot(normal, ld), 0.0, 1.0);
+        vec3 ambient = vec3(.2) * u.color;
+        color = u.color * fDot;
+        color += ambient;
     }
 
 
