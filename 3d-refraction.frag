@@ -4,10 +4,11 @@ precision mediump float;
 
 #define MAX_STEP        100
 #define START           0.0
-#define END             20.0
-#define PRECISION       0.01
+#define END             120.0
+#define PRECISION       0.001
 #define AIR             1.0
 #define BOLL            2.73
+#define EPSILON         0.0005
 
 uniform vec2 u_resolution;
 uniform float u_time;
@@ -52,6 +53,7 @@ Material gold() {
 
 Material makefloors(vec3 p) {
     float fc = mod(floor(p.x) + floor(p.z), 2.0) * 0.7;
+    // fc = .79;
     return Material(
         vec3(fc),
         vec3(0.0),
@@ -86,7 +88,7 @@ vec3 phong(vec3 n, vec3 ld, vec3 rd, Material material) {
 
 Options Sence(vec3 p) {
 
-    Options sphere = sdfSphere(p, vec3(0.0, 0.6, 0.0), 1.0, 2, gold());
+    Options sphere = sdfSphere(p, vec3(0.0, 0.0, 0.0), 1.0, 2, gold());
     Options floors = sdfFloor(p, 1, makefloors(p));
 
     Options O = findMin(sphere, floors);
@@ -108,13 +110,12 @@ Options rayMarch(vec3 ro, vec3 rd) {
 }
 
 vec3 normal(vec3 p) {
-    vec2 e = vec2(1.0, -1.0) - 0.005;
+    vec2 e = vec2(1.0, -1.0) * 0.0005; // epsilon
     return normalize(
-        e.xyy * Sence(p + e.xyy).d + 
-        e.yyx * Sence(p + e.yyx).d + 
-        e.yxy * Sence(p + e.yxy).d +
-        e.xxx * Sence(p + e.xxx).d
-    );
+      e.xyy * Sence(p + e.xyy).d +
+      e.yyx * Sence(p + e.yyx).d +
+      e.yxy * Sence(p + e.yxy).d +
+      e.xxx * Sence(p + e.xxx).d);
 }
 
 mat3 camera(vec3 ro, vec3 lp) {
@@ -131,25 +132,31 @@ mat3 camera(vec3 ro, vec3 lp) {
 
 void main() {
     vec2 uv = (gl_FragCoord.xy - .5 * u_resolution) / u_resolution.y;
-    vec3 ro = vec3(0.0, 4.0, 5.0);
+    vec3 ro = vec3(0.0, 1.0, 5.0);
     vec3 lp = vec3(0.0);
     vec3 rd = camera(ro, lp) * vec3(uv, -1.0);
     vec3 col;
     Options O = rayMarch(ro, rd);
 
     if(O.d > END) {
-        col = vec3(.5);
+        col = vec3(.0);
     } else {
         vec3 p = ro + rd * O.d;
-        vec3 ls = vec3(1.0, 1.0, 1.0);
+        vec3 ls = vec3(sin(u_time) * 10., 10.0, cos(u_time) * 10.);
         vec3 n = normal(p);
         vec3 ld = normalize(ls - n);
 
         col = phong(n, ld, rd, O.material);
+        float dif = clamp(dot(n, ld), 0.0, 1.0);
+        vec3 newOrigin = p + n * PRECISION * 2.0;
+        Options shadow = rayMarch(newOrigin, ld);
+        if( shadow.d < length(ls - newOrigin) ) dif *= 0.0;
 
+        col = col * vec3(dif);
 
+        
     }
-
-
+    col = mix(col, vec3(0.0), 1.0 - exp(-0.0002 * O.d * O.d * O.d));// fog
+    col = pow(col, vec3(1.0/2.2)); // gamma correction
     gl_FragColor = vec4(col, 1.0);
 }
