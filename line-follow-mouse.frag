@@ -24,8 +24,6 @@ void main() {
     float p = abs(cross(vec3(uv + vec2(.5), 0.0), normalize(vec3(mouse + vec2(.5), 0.0))).z);
     float c = 1. - smoothstep(0.0, .001, p);
 
-
-
     
 
     gl_FragColor = vec4(vec3(c) ,1.);

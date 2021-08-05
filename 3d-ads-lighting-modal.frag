@@ -153,12 +153,16 @@ vec3 calcNormal(vec3 p) {
 }
 
 
-
+const float cameraRadius = 10.0;
 void main() {
     vec2 uv = (gl_FragCoord.xy - .5 * u_resolution) / u_resolution.y;
     vec3 color;
     vec3 ro = vec3(0.0, 0.0, 10.0);
     vec3 lp = vec3(0.0);
+
+    ro.x = cameraRadius * cos(u_time * .2) + lp.x;
+    ro.z = cameraRadius * sin(u_time * .2) + lp.z;
+
     vec3 rd = camera(ro, lp) * normalize(vec3(uv, -1.0));
 
     Items O = rayMarch(ro, rd);
@@ -169,7 +173,7 @@ void main() {
         vec3 p = ro + rd * O.d;
         vec3 normal = normalize(calcNormal(p));
 
-        vec3 ls = vec3(-8.0, -6.0, -5.0);
+        vec3 ls = vec3(-8.0, -6.0, -0.0);
         vec3 ld = normalize(ls - p);
         float lightIdensity = .9;
         color = phong(O.m, normal, ld, rd) * lightIdensity;
